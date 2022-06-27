@@ -11,6 +11,7 @@ public class Combinations : MonoBehaviour
     void Start()
     {
         UIManager.endRoundEvent += checkCombos;
+        //combinations = new List<Combo>();
 
     }
 
@@ -65,6 +66,7 @@ public class Combinations : MonoBehaviour
         {
             for (int i = 0; i < combinations.Count; i++)
             {
+                Debug.Log(i);
                 int temp = checkCards(i, tempDec);
               
                 if
@@ -96,8 +98,10 @@ public class Combinations : MonoBehaviour
 
     public int checkCards(int combo, List<GameObject> tempDec)
     {
+        Debug.Log(tempDec.Count + "is count");
         foreach (var item in tempDec)
         {
+            Debug.Log(item.GetComponent<baseCard>().cardType);
             if (!combinations[combo].contains(item.GetComponent<baseCard>().cardType))
             {
                 return -1;

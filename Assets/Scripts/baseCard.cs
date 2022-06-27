@@ -16,6 +16,7 @@ public class baseCard : MonoBehaviour
     public int dmg;
     public int heal;
     public int powerCost;
+    
    
 
     public Sprite none;

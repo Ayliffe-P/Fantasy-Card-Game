@@ -25,10 +25,11 @@ public class Player : baseUnit
     {
         
     }
+    
 
     public override void drawCards()
     {
-        Debug.Log(player);
+        Debug.Log("drawing");
         while (cards.Count < 20)
         {
             GameObject temp = deck.generateCard();

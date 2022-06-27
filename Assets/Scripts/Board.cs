@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public enum User {None, PlayerOne, PlayerTwo}
-public class Board : MonoBehaviour
+public enum Effect { None, Poison, Illusion, Explosion, Arcane }
+public  class Board : MonoBehaviour
 {
-    public static Board _instance;
+    public static Board _instance ;
 
     public void Awake()
     {
@@ -18,7 +21,11 @@ public class Board : MonoBehaviour
             _instance = this;
         }
     }
-
+    public Board(baseUnit p1, baseUnit p2) {
+        _playerOne = p1;
+        _playerTwo = p2;
+    }
+   
     public bool playerTurn;
 
     public Deck boardDeck;
@@ -28,13 +35,24 @@ public class Board : MonoBehaviour
 
     public baseUnit _playerOne;
     public baseUnit _playerTwo;
+    
 
     public Transform playerOne_DeckArea;
     public Transform playerTwo_DeckArea;
     public GameObject playerOne;
 
+    public int round;
+
+    public Effect effect1;
+    public Effect effect2;
+
     [SerializeField] private List<GameObject> EnemyPlacedcards = new List<GameObject>();
     [SerializeField] private List<GameObject> PlayerPlacedcards = new List<GameObject>();
+
+    private List<GameObject> EnemySimulationCards = new List<GameObject>();
+    private List<GameObject> PlayerSimulationCards = new List<GameObject>();
+
+
 
     public List<GameObject> returnCopyPlayerPlacedCards() {  List < GameObject > temporary = new List<GameObject>(PlayerPlacedcards);
         return temporary; 
@@ -45,12 +63,20 @@ public class Board : MonoBehaviour
         return temporary;
     }
 
+    public void endSimulationRound()
+    { 
 
-    void Start()
+
+
+    }
+
+
+        void Start()
     {
           
         playerOne = new GameObject();
         setupEvent = setupBoardHotseat;
+        round = 1;
         UIManager.endRoundEvent += endRound;        
         if (setupEvent != null)
         {
@@ -98,7 +124,14 @@ public class Board : MonoBehaviour
             _playerTwo.CurrentHp = _playerTwo.CurrentHp + amount;
         }
     }
+   /* public object clone() {
 
+       // var clone = new Board((baseUnit)_playerOne.Clone(), (baseUnit) _playerTwo.Clone());
+       // return clone;
+
+    
+    }
+   */
 
 
 
@@ -111,6 +144,58 @@ public class Board : MonoBehaviour
 
         }
     }
+
+    public void generateBoard() {
+
+
+
+
+        switch (effect1)
+        {
+            case Effect.None:
+                _playerOne.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.white;
+                break;
+            case Effect.Poison:
+                _playerOne.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.green;
+                break;
+            case Effect.Illusion:
+                _playerOne.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.blue;
+                break;
+            case Effect.Explosion:
+                _playerOne.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.yellow;
+                break;
+            case Effect.Arcane:
+                _playerOne.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.magenta;
+                break;
+            default:
+                break;
+        }
+        switch (effect2)
+        {
+            case Effect.None:
+                _playerTwo.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.white;
+                break;
+            case Effect.Poison:
+                _playerTwo.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.green;
+                break;
+            case Effect.Illusion:
+                _playerTwo.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.blue;
+                break;
+            case Effect.Explosion:
+                _playerTwo.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.yellow;
+                break;
+            case Effect.Arcane:
+                _playerTwo.GetComponent<baseUnit>().playArea.GetComponent<Image>().color = Color.magenta;
+                break;
+            default:
+                break;
+        }
+
+
+
+
+    }
+
 
     void setupBoardHotseat() {
 
@@ -135,9 +220,14 @@ public class Board : MonoBehaviour
             }clearPlayArea();
             playerTurn = false;
 
-
+            if (Settings._instance.mode == Mode.AI_Type1)
+            {
+            _playerTwo.GetComponent<AI>().startTurn();
+            }
+            
         } else 
         {
+            
             foreach (GameObject item in EnemyPlacedcards)
             {
                 item.GetComponent<baseCard>().activate();
@@ -147,10 +237,15 @@ public class Board : MonoBehaviour
         }
         if (!checkEndGame())
         {
-        givePower();
-        stateTurn();
-        }
         
+        stateTurn();
+            if (round % 2 == 0)
+            {
+            givePower();
+                generateBoard();
+            }
+        }
+        round = round + 1;
         
     }
 
@@ -190,7 +285,7 @@ public class Board : MonoBehaviour
 
     }
 
-
+    
 
     public void placeCardOnBoard(User user, GameObject card) {
 

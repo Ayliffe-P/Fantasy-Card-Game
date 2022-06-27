@@ -1,16 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class baseUnit : MonoBehaviour
 {
     [SerializeField] 
     protected List<GameObject> cards = new List<GameObject>();
-
+    
     public List<GameObject> Cards { get { return cards; }
         set { cards = value; }
     }
     public Transform deckArea;
+    public Transform playArea;
     [SerializeField]
     protected int powerlvl;
 
@@ -18,6 +20,12 @@ public class baseUnit : MonoBehaviour
        
         deck = temp;
     
+    }
+    public baseUnit(List<GameObject> _cards, int _powerlevel, int _health)
+    {
+        cards = _cards;
+        powerlvl = _powerlevel;
+        currentHp = _health;
     }
     public User player;
     public int Powerlvl {
@@ -43,6 +51,12 @@ public class baseUnit : MonoBehaviour
     {
         
     }
+    public baseUnit AICopy()
+    {
+        baseUnit other = (baseUnit)this.MemberwiseClone();
+        Debug.Log(other.cards.Count);
+        return other;
+    }
 
     // Update is called once per frame
     void Update()
@@ -67,6 +81,13 @@ public class baseUnit : MonoBehaviour
         
         return (powerlvl - card.powerCost >= 0);        //Returns true if player has enough Power to place card
         
+    }
+
+    public baseUnit Clone(baseUnit temp) { 
+
+        baseUnit cl = new baseUnit(temp.cards, temp.powerlvl, temp.currentHp);
+        return cl;
+
     }
     
 
