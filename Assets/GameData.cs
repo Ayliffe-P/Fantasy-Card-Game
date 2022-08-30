@@ -6,20 +6,20 @@ using UnityEngine;
 
 public class GameData 
 {
-    [SerializeField] private int fireballCount = 0;
-    [SerializeField] private int fireballWinCount = 0;
+    [SerializeField] public int fireballCount ;
+    [SerializeField] public int fireballWinCount ;
 
-    [SerializeField] private int swordsmanCount = 0;
-    [SerializeField] private int swordsmanWinCount = 0;
+    [SerializeField] public int swordsmanCount ;
+    [SerializeField] public int swordsmanWinCount ;
 
-    [SerializeField] private int wizardCount = 0;
-    [SerializeField] private int wizardWinCount = 0;
+    [SerializeField] public int wizardCount ;
+    [SerializeField] public int wizardWinCount ;
 
-    [SerializeField] private int soldierCount = 0;
-    [SerializeField] private int soldierWinCount = 0;
+    [SerializeField] public int soldierCount ;
+    [SerializeField] public int soldierWinCount ;
 
-    [SerializeField] private int staffCount = 0;
-    [SerializeField] private int staffWinCount = 0;
+    [SerializeField] public int staffCount ;
+    [SerializeField] public int staffWinCount ;
 
     void Start()
     {
@@ -51,19 +51,19 @@ public class GameData
     }
     public GameData()
         { 
-        fireballCount = 0;
-        fireballWinCount = 0;
+        fireballCount = 1;
+        fireballWinCount = 1;
 
-        swordsmanCount = 0;
-        swordsmanWinCount = 0;
+        swordsmanCount = 1;
+        swordsmanWinCount = 1;
 
-        wizardCount = 0;
-        wizardWinCount = 0;
+        wizardCount = 1;
+        wizardWinCount = 1;
 
-        soldierCount = 0;
-        soldierWinCount = 0;
+        soldierCount = 1;
+        soldierWinCount = 1;
 
-        staffCount = 0;
-        staffWinCount = 0;
+        staffCount = 1;
+        staffWinCount = 1;
         }
     }

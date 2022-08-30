@@ -4,6 +4,7 @@ using UnityEngine;
 // This for the AI search was adapted from this website https://unitygem.wordpress.com/tree-search/
 public class AI : Player
 {
+   // public Board instance;
     public move move;
     public int tempPowerlvl;
     List<GameObject> nextMove;
@@ -166,9 +167,9 @@ public class AI : Player
         for (int i = 0; i < play.Count; i++)
         {
             play[i].transform.SetParent(playArea.transform, false);
-            Board._instance.placeCardOnBoard(User.PlayerTwo, play[i]);
-            Board._instance._playerTwo.Cards.Remove(play[i]);
-            Board._instance._playerTwo.Powerlvl = Board._instance._playerTwo.Powerlvl - play[i].GetComponent<baseCard>().powerCost;
+            instance.placeCardOnBoard(User.PlayerTwo, play[i]);
+            instance._playerTwo.Cards.Remove(play[i]);
+            instance._playerTwo.Powerlvl = instance._playerTwo.Powerlvl - play[i].GetComponent<baseCard>().powerCost;
         }
      }
     public baseUnit copy;
@@ -213,4 +214,8 @@ public class AI : Player
         }
         return cardsToPlay;   
     }
+
+    
+
+
 }

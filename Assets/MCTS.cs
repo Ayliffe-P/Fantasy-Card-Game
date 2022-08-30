@@ -10,21 +10,22 @@ using System.IO;
 [System.Serializable]
 public class MCTS : Player
 {
+    //public Board instance;
 
-    private int fireballCount = 0;
-    private int fireballWinCount = 0;
+    public int fireballCount = 1;
+    public int fireballWinCount = 1;
 
-    private int swordsmanCount = 0;
-    private int swordsmanWinCount = 0;
+    public int swordsmanCount = 1;
+    public int swordsmanWinCount = 1;
 
-    private int wizardCount = 0;
-    private int wizardWinCount = 0;
+    public int wizardCount = 1;
+    public int wizardWinCount = 1;
 
-    private int soldierCount = 0;
-    private int soldierWinCount = 0;
+    public int soldierCount = 1;
+    public int soldierWinCount = 1;
 
-    private int staffCount = 0;
-    private int staffWinCount = 0;
+    public int staffCount = 1;
+    public int staffWinCount = 1;
 
     string saveFile;
 
@@ -34,8 +35,10 @@ public class MCTS : Player
     // private List<GameObject> cardsCopy;
     public int depth;
 
-    public Board boardClone;
-    public baseUnit playerCopy;
+    public SimBoard boardClone;
+    public SimAI playerCopyOne;
+    public SimAI playerCopyTwo;
+    
 
     public MCTS(Deck temp, Transform deckArea) : base(temp, deckArea)
     {
@@ -47,12 +50,17 @@ public class MCTS : Player
 
     void Start()
     {
-        // copy = AICopy();
-        Invoke("simulate", 2f);      
+            loadData();
+
+            Powerlvl = 5;
+            CurrentHp = maxHp;
+            drawCards();
+            // copy = AICopy();
+          //  Invoke("simulate", 2f);      
         // writeFile();
         // readFile();
         //boardClone = (Board)Board._instance.clone();
-        playerCopy = Board._instance._playerOne.Clone(Board._instance._playerOne);
+        //playerCopy = Board._instance._playerOne.Clone(Board._instance._playerOne);
         //Debug.Log(copy.Cards.Count);
         Debug.Log("Starting");
         // SaveFile();
@@ -62,45 +70,96 @@ public class MCTS : Player
     private void Awake()
     {
         saveFile = Application.persistentDataPath + "/savedata.json";
+        Debug.Log(Application.persistentDataPath);
+    }
+
+    public void loadData() {
+        GameData data = readFile();
+        Debug.Log(data.fireballCount);
+        if (data != null)
+        {
+            fireballCount = data.fireballCount;
+            fireballWinCount = data.fireballWinCount;
+            swordsmanCount = data.swordsmanCount;
+            swordsmanWinCount = data.swordsmanWinCount;
+            wizardCount = data.wizardCount;
+            wizardWinCount = data.wizardWinCount;
+            soldierCount = data.soldierCount;
+            soldierWinCount = data.soldierWinCount;
+            staffCount = data.staffCount;
+            staffWinCount = data.staffWinCount;
+        }
+        else {
+            fireballCount = 1;
+            fireballWinCount = 1;
+            swordsmanCount = 1;
+            swordsmanWinCount = 1;
+            wizardCount = 1;
+            wizardWinCount = 1;
+            soldierCount = 1;
+            soldierWinCount = 1;
+            staffCount = 1;
+            staffWinCount = 1;
+        }
     }
 
 
     public void treesearch() {
      
         List<GameObject> playingCards = new List<GameObject>();
-
-       playingCards = getBestCardPlay();
+        copy = instance._playerTwo.Clone(instance._playerTwo);
+        playingCards = getBestCardPlay();
+        //place cards
         timer = 0;
-        while (timer < 10)
+
+        foreach (var item in playingCards)
         {
-
-            timer += Time.deltaTime;
+            item.transform.SetParent(playArea.transform, false);
+            instance.placeCardOnBoard(User.PlayerTwo, item);
+            instance._playerTwo.Cards.Remove(item);
+            instance._playerTwo.Powerlvl = instance._playerTwo.Powerlvl - item.GetComponent<baseCard>().powerCost;
         }
+
+        InitiateSimulation();
         //boardClone = new Board(boa)
-
+        /*while (timer < 2)
+        {
+            timer += Time.deltaTime;
+        }*/
         }
+
+    public MCTS(List<GameObject> _cards, int _powerlevel, int _health, User user) : base (_cards, _powerlevel, _health, user)
+    {
+        cards = _cards;
+        powerlvl = _powerlevel;
+        currentHp = _health;
+    }
 
     public List<GameObject> getBestCardPlay() {
         List<GameObject> _availableCards = getCardsInCopyPowerCost(copy.Cards);
+        //Debug.Log("AVAILALBE CARDS IS " + _availableCards.Count);
         List<GameObject> cardsToPlay = new List<GameObject>();
         GameObject card = null;
-        while (_availableCards.Count != 0 && timer < 10)
+        while (_availableCards.Count != 0 && timer < 2)
         {
            
             foreach (var item in _availableCards)
             {
-               
+
                 if (card == null)
                 {
                     card = item;
+                   // cardsToPlay.Add(card);
                 }
-                else if (getUCBValue( item.GetComponent<baseCard>().cardType, cardsToPlay[cardsToPlay.Count-1].GetComponent<baseCard>().cardType ) > getUCBValue(card.GetComponent<baseCard>().cardType, cardsToPlay[cardsToPlay.Count - 1].GetComponent<baseCard>().cardType))
+                else if (cardsToPlay.Count > 0) { 
+                        if (getUCBValue( item.GetComponent<baseCard>().cardType, cardsToPlay[cardsToPlay.Count-1].GetComponent<baseCard>().cardType ) > getUCBValue(card.GetComponent<baseCard>().cardType, cardsToPlay[cardsToPlay.Count - 1].GetComponent<baseCard>().cardType))
                 {
                     card = item;
-                }
+                }}
             }
             cardsToPlay.Add(card);
-
+            copy.Powerlvl = copy.Powerlvl - card.GetComponent<baseCard>().powerCost;
+            card = null;
 
             timer += Time.deltaTime;
             _availableCards.Clear();
@@ -109,16 +168,81 @@ public class MCTS : Player
         return cardsToPlay;
     }
 
-    public void simulate() {
-        Debug.Log("simulating");
-        // copy = AICopy();
-        playerCopy = Board._instance._playerOne.Clone(Board._instance._playerOne);
-        Debug.Log(playerCopy.Cards.Count);
+    public void InitiateSimulation() {
+        playerCopyOne = null;
+        playerCopyTwo = null;
+        boardClone = null;
+     
+        playerCopyOne = new SimAI(instance._playerOne.Cards, instance._playerOne.Powerlvl, instance._playerOne.CurrentHp, User.PlayerOne);
+        playerCopyTwo = new SimAI(instance._playerTwo.Cards, instance._playerTwo.Powerlvl, instance._playerTwo.CurrentHp, User.PlayerTwo);
+       
+        boardClone = new SimBoard(playerCopyOne, playerCopyTwo, this, instance.playerTurn, instance.round);
 
+        boardClone.SetupSimulation();
+       // boardClone.SetupSimulation();
 
+    }
 
+    public void updateStats(CardType type, int val) {
+        if (val == 1)
+        {
+            switch (type)
+            {
+                case CardType.SOLDIER:
+                    soldierCount = soldierCount + 1;
+                    soldierWinCount = soldierWinCount + 1;
+                    break;
+                case CardType.SWORDSMAN:
+                    swordsmanCount = swordsmanCount + 1;
+                    swordsmanWinCount = swordsmanWinCount + 1;
+                    break;
+                case CardType.FIREBALL:
+                    fireballCount = fireballCount + 1;
+                    fireballWinCount = fireballWinCount + 1;
+                    break;
+                case CardType.STAFF:
+                    staffCount = staffCount + 1;
+                    staffWinCount = staffWinCount + 1;
+                    break;
+                case CardType.WIZARD:
+                    wizardCount = wizardCount + 1;
+                    wizardWinCount = wizardWinCount + 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            switch (type)
+            {
+                case CardType.SOLDIER:
+                    soldierCount = soldierCount + 1;
+                    break;
+                case CardType.SWORDSMAN:
+                    swordsmanCount = swordsmanCount + 1;
+                    break;
+                case CardType.FIREBALL:
+                    fireballCount = fireballCount + 1;
+                    break;
+                case CardType.STAFF:
+                    staffCount = staffCount + 1;
+                    break;
+                case CardType.WIZARD:
+                    wizardCount = wizardCount + 1;
+                    break;
+                default:
+                    break;
+            }
+        }
+        writeFile();
+        
+    }
 
+    public void Simulate() { 
+    
 
+    
     }
     public List<GameObject> getCardsInCopyPowerCost(List<GameObject> _cards)
     {
@@ -187,104 +311,41 @@ public class MCTS : Player
                 numParent = wizardCount;
                 break;
         }
-
+        Debug.Log(numWin + " " + num + " " + numParent);
         return ((numWin/num) + (Mathf.Sqrt(2) * Mathf.Sqrt(Mathf.Log(numParent)/num)));
 
 
 
     }
 
+    
+    
 
- 
 
-    public double getPowerCostHeuristic(double x = 0.0)
+   
+
+    public GameData readFile()
     {
-        // Returns the the cards powercost Heuristic;
-        //double  = 0.0;
-        double y;
-
-        y = -0.06666667 * x + 1;
-        //Debug.Log(y);
-        return y;
-    }
-
-    public double getHealHeuristic(double x = 0.0)
-    {
-        // Returns the the cards heal Heuristic;
-
-        //double  = 0.0;
-        double y;
-
-
-        y = 0.4463544 * (Mathf.Pow((float)x, 0.2692637f));
-        //Debug.Log(y);
-        return y;
-    }
-
-    public double getDamageHeuristic(double x = 0.0)
-    {
-        // Returns the the cards damage Heuristic;
-
-        double y;
-
-
-        y = 0.4463544 * (Mathf.Pow((float)x, 0.2692637f));
-        //Debug.Log(y);
-        return y;
-    }
-
-    public double getNeedToHealHeuristic(double x = 0.0)
-    {
-        // Returns the players Need to heal Heuristic;
-        double y;
-
-        y = -0.6388314 + 1.65594 * (Mathf.Pow((float)(float)System.Math.E, ((float)-0.0324402 * (float)x)));
-
-        return y;
-    }
-    public double getNeedForPowerHeuristic(double x = 0.0)
-    {
-        // Returns the players Need for power Heuristic;
-        double y;
-
-        y = -0.5107393 + 1.51074 * (Mathf.Pow((float)(float)System.Math.E, ((float)-0.07229967 * (float)x)));
-
-        return y;
-    }
-
-    public double getCardHeuristic(baseCard card)
-    {
-        // Returns the Average Heuristic of the Card
-
-        if (card.heal != 0 || getNeedToHealHeuristic(currentHp) <= 0.5)
-        {
-            return ((getPowerCostHeuristic(card.powerCost) + getDamageHeuristic(card.dmg) + getHealHeuristic(card.heal)) / 3);
-        }
-        else
-        {
-            Debug.Log(card + " " + (getPowerCostHeuristic(card.powerCost) + getDamageHeuristic(card.dmg) + getHealHeuristic(card.heal)) / 3);
-            return ((getPowerCostHeuristic(card.powerCost) + getDamageHeuristic(card.dmg)) / 2);
-        }
-    }
-
-    public void readFile()
-    {
+        GameData data = new GameData();
         // Does the file exist?
         if (File.Exists(saveFile))
         {
+            //Debug.Log("exists");
             // Read the entire file and save its contents.
             string fileContents = File.ReadAllText(saveFile);
-            GameData data = new GameData();
+            //GameData data = new GameData();
            // Deserialize the JSON data 
            //  into a pattern matching the GameData class.
            data = JsonUtility.FromJson<GameData>(fileContents);
             Debug.Log(data);
+            //return data;
         }
+        return data;
     }
 
     public void writeFile()
     {
-        GameData data = new GameData(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+        GameData data = new GameData(fireballCount, fireballWinCount, swordsmanCount, swordsmanWinCount, wizardCount, wizardWinCount, soldierCount, soldierWinCount, staffCount, staffWinCount);
         // Serialize the object into JSON and save string.
         string jsonString = JsonUtility.ToJson(data);
 
@@ -293,49 +354,7 @@ public class MCTS : Player
         File.WriteAllText(saveFile, jsonString);
     }
 
-    public List<GameObject> search()
-    {
-
-        copy = AICopy();
-        int depthIndex = 0;
-        List<GameObject> _availableCards = getCardsInCopyPowerCost(copy.Cards);
-        List<GameObject> cardsToPlay = new List<GameObject>();
-        Debug.Log(getNeedForPowerHeuristic(powerlvl));
-        if (getNeedForPowerHeuristic(powerlvl) >= 0.46)
-        {
-            return cardsToPlay;
-        }
-
-
-
-        GameObject card = null;
-        while (_availableCards.Count != 0 && depthIndex <= depth)
-        {
-
-            foreach (var item in _availableCards)
-            {
-                Debug.Log(item.GetComponent<baseCard>());
-                if (card == null)
-                {
-                    card = item;
-                }
-                else if (getCardHeuristic(item.GetComponent<baseCard>()) > getCardHeuristic(card.GetComponent<baseCard>()))
-                {
-                    card = item;
-                }
-
-            }
-
-            cardsToPlay.Add(card);
-            copy.Cards.Remove(card);
-            copy.Powerlvl = copy.Powerlvl - card.GetComponent<baseCard>().powerCost;
-            card = null;
-            depthIndex = depthIndex + 1;
-            _availableCards.Clear();
-            _availableCards = getCardsInCopyPowerCost(copy.Cards);
-        }
-        return cardsToPlay;
-    }
+    
 
 
 

@@ -13,6 +13,7 @@ public class baseUnit : MonoBehaviour
     }
     public Transform deckArea;
     public Transform playArea;
+    public Board instance;
     [SerializeField]
     protected int powerlvl;
 
@@ -21,11 +22,12 @@ public class baseUnit : MonoBehaviour
         deck = temp;
     
     }
-    public baseUnit(List<GameObject> _cards, int _powerlevel, int _health)
+    public baseUnit(List<GameObject> _cards, int _powerlevel, int _health, User user)
     {
         cards = _cards;
         powerlvl = _powerlevel;
         currentHp = _health;
+        player = user;
     }
     public User player;
     public int Powerlvl {
@@ -70,6 +72,7 @@ public class baseUnit : MonoBehaviour
             GameObject temp = deck.generateCard();
             temp.gameObject.tag = "playercard";
             temp.GetComponent<baseCard>().owner = player;
+            temp.GetComponent<baseCard>().instance = instance;
             cards.Add(temp);
            
             
@@ -85,10 +88,17 @@ public class baseUnit : MonoBehaviour
 
     public baseUnit Clone(baseUnit temp) { 
 
-        baseUnit cl = new baseUnit(temp.cards, temp.powerlvl, temp.currentHp);
+        baseUnit cl = new baseUnit(temp.cards, temp.powerlvl, temp.currentHp, temp.player);
         return cl;
 
     }
-    
+    public MCTS ClonetoMCTS(baseUnit temp)
+    {
+
+        MCTS cl = new MCTS(temp.cards, temp.powerlvl, temp.currentHp, temp.player);
+        return cl;
+
+    }
+
 
 }

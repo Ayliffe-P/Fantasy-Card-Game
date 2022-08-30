@@ -222,9 +222,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7e9f2b7f48f7e74d87f722584381832, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  instance: {fileID: 0}
   owner: 0
   cardType: 3
-  buff: 0
+  effect: 4
   dmg: 5
   heal: 9
   powerCost: 6
@@ -258,4 +259,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53aad42cb5e2d054a88fc903b8103c35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  instance: {fileID: 0}
   Canvas: {fileID: 0}

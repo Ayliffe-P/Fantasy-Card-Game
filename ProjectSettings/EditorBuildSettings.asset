@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/AI.unity
     guid: 29211c4647a895c478ee8043c63974c8
+  - enabled: 1
+    path: Assets/Scenes/MCST.unity
+    guid: 6cc695d20e3c9eb4ea5015cf1b84789e
   m_configObjects: {}

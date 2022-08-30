@@ -11,7 +11,13 @@ public class Player : baseUnit
          
     }
 
-    
+    public Player(List<GameObject> _cards, int _powerlevel, int _health, User user) : base( _cards,  _powerlevel, _health, user)
+    {
+       
+
+    }
+
+
 
     void Start()
     {
@@ -36,6 +42,7 @@ public class Player : baseUnit
             temp.transform.SetParent(deckArea);
             //temp.GetComponent<baseCard>().user = this;
             temp.GetComponent<baseCard>().owner = player;
+            temp.GetComponent<baseCard>().instance = instance;
             cards.Add(temp);
            
         }

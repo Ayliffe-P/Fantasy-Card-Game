@@ -5,7 +5,7 @@ using UnityEngine;
 public class Combinations : MonoBehaviour
 {
     public List<Combo> combinations;
-
+    public Board instance;
 
 
     void Start()
@@ -50,15 +50,15 @@ public class Combinations : MonoBehaviour
 
     public void checkCombos()
     {
-        bool turn = Board._instance.playerTurn;
+        bool turn = instance.playerTurn;
         List<GameObject> tempDec;
         if (turn == true)
         {
-            tempDec = Board._instance.returnCopyPlayerPlacedCards();
+            tempDec = instance.returnCopyPlayerPlacedCards();
         }
         else
         {
-            tempDec = Board._instance.returnCopyEnemyPlacedCards();
+            tempDec = instance.returnCopyEnemyPlacedCards();
         }
         
 
@@ -74,11 +74,11 @@ public class Combinations : MonoBehaviour
                 {
                     if (turn == true)
                     {
-                        Board._instance.attackPlayer(User.PlayerTwo, combinations[temp].addit_Dmg);
-                        Board._instance.healPlayer(User.PlayerOne, combinations[temp].addit_Heal);
+                        instance.attackPlayer(User.PlayerTwo, combinations[temp].addit_Dmg);
+                        instance.healPlayer(User.PlayerOne, combinations[temp].addit_Heal);
                     } else if (turn == false) {
-                        Board._instance.attackPlayer(User.PlayerOne, combinations[temp].addit_Dmg);
-                        Board._instance.healPlayer(User.PlayerTwo, combinations[temp].addit_Heal);
+                        instance.attackPlayer(User.PlayerOne, combinations[temp].addit_Dmg);
+                        instance.healPlayer(User.PlayerTwo, combinations[temp].addit_Heal);
                     }
                     Debug.Log("is damage: " + combinations[temp].addit_Dmg);
                 }

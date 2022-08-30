@@ -63,6 +63,11 @@ public class MenuUI : MonoBehaviour
         Settings._instance.difficulty = Difficulty.Hard;
         SceneManager.LoadScene(02);
     }
+    public void setModeMCST()
+    {
+        Settings._instance.mode = Mode.AI_Type2;
+        SceneManager.LoadScene(03);
+    }
 
     public void clickBackTwo()
     {

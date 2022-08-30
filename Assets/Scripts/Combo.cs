@@ -18,7 +18,6 @@ public class Combo : MonoBehaviour
     }
     public bool containsItem(CardType cardType)
     {
-
         foreach (CardType i in combo)
         {
             Debug.Log(i + " is i and cardtype is  " + cardType);
@@ -33,13 +32,11 @@ public class Combo : MonoBehaviour
         return false;
     }
     public bool contains(CardType cardType) {
-
         if (combo.Contains(cardType))
         {
             return true;
         }
         return false;
-
     }
 
     public int getDmg() {

@@ -89,6 +89,8 @@
     <Compile Include="Assets\Scripts\baseUnit.cs" />
     <Compile Include="Assets\Scripts\minimax.cs" />
     <Compile Include="Assets\Scripts\move.cs" />
+    <Compile Include="Assets\SimAI.cs" />
+    <Compile Include="Assets\SimBoard.cs" />
     <Compile Include="Assets\test.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>Z:/School/GADE/GADE7311/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

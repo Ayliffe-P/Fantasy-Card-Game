@@ -8,23 +8,15 @@ public enum User {None, PlayerOne, PlayerTwo}
 public enum Effect { None, Poison, Illusion, Explosion, Arcane }
 public  class Board : MonoBehaviour
 {
-    public static Board _instance ;
+   // public static Board _instance ;
 
     public void Awake()
     {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            _instance = this;
-        }
+        
     }
-    public Board(baseUnit p1, baseUnit p2) {
-        _playerOne = p1;
-        _playerTwo = p2;
-    }
+    
+
+    
    
     public bool playerTurn;
 
@@ -35,7 +27,11 @@ public  class Board : MonoBehaviour
 
     public baseUnit _playerOne;
     public baseUnit _playerTwo;
+
+    public System.Random rnd;
+
     
+
 
     public Transform playerOne_DeckArea;
     public Transform playerTwo_DeckArea;
@@ -49,8 +45,7 @@ public  class Board : MonoBehaviour
     [SerializeField] private List<GameObject> EnemyPlacedcards = new List<GameObject>();
     [SerializeField] private List<GameObject> PlayerPlacedcards = new List<GameObject>();
 
-    private List<GameObject> EnemySimulationCards = new List<GameObject>();
-    private List<GameObject> PlayerSimulationCards = new List<GameObject>();
+    
 
 
 
@@ -63,16 +58,14 @@ public  class Board : MonoBehaviour
         return temporary;
     }
 
-    public void endSimulationRound()
-    { 
+    
 
-
-
-    }
+    
 
 
         void Start()
     {
+        rnd = new System.Random();
           
         playerOne = new GameObject();
         setupEvent = setupBoardHotseat;
@@ -124,15 +117,7 @@ public  class Board : MonoBehaviour
             _playerTwo.CurrentHp = _playerTwo.CurrentHp + amount;
         }
     }
-   /* public object clone() {
-
-       // var clone = new Board((baseUnit)_playerOne.Clone(), (baseUnit) _playerTwo.Clone());
-       // return clone;
-
-    
-    }
-   */
-
+  
 
 
     public void checkCombos(User playerToCheckCombos) {
@@ -143,6 +128,84 @@ public  class Board : MonoBehaviour
 
 
         }
+    }
+
+    public void proceduralGeneration() {
+
+        List<Effect> playerOneEffects = new List<Effect>();
+        List<Effect> playerTwoEffects = new List<Effect>();
+
+        playerOneEffects.Add(Effect.None);
+        playerTwoEffects.Add(Effect.None);
+
+
+        if (containsEffect(Effect.Arcane, User.PlayerOne))
+        {
+            playerOneEffects.Add(Effect.Arcane);
+        }
+        if (containsEffect(Effect.Illusion, User.PlayerOne))
+        {
+            playerOneEffects.Add(Effect.Illusion);
+        }
+        if (containsEffect(Effect.Explosion, User.PlayerOne))
+        {
+            playerOneEffects.Add(Effect.Explosion);
+        }
+        if (containsEffect(Effect.Poison, User.PlayerOne))
+        {
+            playerOneEffects.Add(Effect.Poison);
+        }
+
+        if (containsEffect(Effect.Arcane, User.PlayerTwo))
+        {
+            playerTwoEffects.Add(Effect.Arcane);
+        }
+        if (containsEffect(Effect.Illusion, User.PlayerTwo))
+        {
+            playerTwoEffects.Add(Effect.Illusion);
+        }
+        if (containsEffect(Effect.Explosion, User.PlayerTwo))
+        {
+            playerTwoEffects.Add(Effect.Explosion);
+        }
+        if (containsEffect(Effect.Poison, User.PlayerTwo))
+        {
+            playerTwoEffects.Add(Effect.Poison);
+        }
+
+        effect1 = playerOneEffects[rnd.Next(0, playerOneEffects.Count - 1)];
+        effect2 = playerTwoEffects[rnd.Next(0, playerTwoEffects.Count - 1)];
+        generateBoard();
+
+
+    }
+
+    public bool containsEffect( Effect eff, User player) {
+        
+        if (player == User.PlayerOne)
+        {
+        foreach (var item in _playerOne.Cards)
+        {
+            if (item.GetComponent<baseCard>().effect == eff)
+            {
+                return true;
+            }
+        } return false;
+        } else
+        {
+            foreach (var item in _playerTwo.Cards)
+            {
+                if (item.GetComponent<baseCard>().effect == eff)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
+
     }
 
     public void generateBoard() {
@@ -224,7 +287,12 @@ public  class Board : MonoBehaviour
             {
             _playerTwo.GetComponent<AI>().startTurn();
             }
-            
+            if (Settings._instance.mode == Mode.AI_Type2)
+            {
+                _playerTwo.GetComponent<MCTS>().treesearch();
+                Debug.Log("tree");
+            }
+
         } else 
         {
             
@@ -242,7 +310,8 @@ public  class Board : MonoBehaviour
             if (round % 2 == 0)
             {
             givePower();
-                generateBoard();
+            proceduralGeneration();
+            //generateBoard();
             }
         }
         round = round + 1;
@@ -255,6 +324,7 @@ public  class Board : MonoBehaviour
 
 
     }
+   
 
     public void clearPlayArea() {
         if (playerTurn == true)
@@ -266,10 +336,11 @@ public  class Board : MonoBehaviour
         {
             EnemyPlacedcards.Clear();
         }
-    
-    }
 
-    public bool checkEndGame() {
+        }
+
+    
+        public bool checkEndGame() {
         Debug.Log("checkig");
         if ( _playerTwo.CurrentHp <= 0)
         {
